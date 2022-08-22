@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
-// *** CUSTOM CURSOR by Adrián Gubrica, v1.0 *** //
+// *** CUSTOM CURSOR by Adrián Gubrica, v1.1 *** //
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
@@ -11,7 +11,10 @@
 // ---> ease [int or float] - Amount of ease on cursor movement. Also affects the stickyAmount a little.
 // ---> sticky [bool] = If true, stickiness is turned on.
 // ---> stickyAmount [int or float] = Amount of force, that holds the cursor in the centre of the hovered object.
-// ---> hoverClass [string] = Class, that is added to the selectorInner on hover.
+
+// ---> hoverClass [string] = Class, that is added to the selectorInner while hovering an item having 'data-cursor="hover"'.
+// ---> soonClass [string] = Class, that is added to the selectorInner while hovering an item having 'data-cursor="soon"'.
+// ---> dragClass [string] = Class, that is added to the selectorInner while hovering an item having 'data-cursor="drag"'.
 
 export default class CustomCursor {
   constructor(_options) {
@@ -27,6 +30,8 @@ export default class CustomCursor {
     this.sticky = _options.sticky
     this.stickyAmount = _options.stickyAmount
     this.hoverClass = _options.hoverClass
+    this.soonClass = _options.soonClass
+    this.dragClass = _options.dragClass
 
     // Flags
     this.flagSticky = false
@@ -57,29 +62,43 @@ export default class CustomCursor {
 
   getHoverItems() {
     this.hoverItems = document.querySelectorAll('[data-cursor="hover"]')
+    this.soonItems = document.querySelectorAll('[data-cursor="soon"]')
+    this.dragItems = document.querySelectorAll('[data-cursor="drag"]')
 
-    this.hoverItems.forEach((_item) => {
-      // ---> Add
-      _item.addEventListener('mouseenter', () => {
-        this.selectorInner.classList.add(this.hoverClass)
-        if (this.sticky) {
-          this.flagSticky = true
+    this.findHoverItems(this.hoverItems, this.hoverClass)
+    this.findHoverItems(this.soonItems, this.soonClass)
+    this.findHoverItems(this.dragItems, this.dragClass)
+  }
 
-          this.hoverPosition = {
-            x: _item.getBoundingClientRect().x + _item.getBoundingClientRect().width / 2,
-            y: _item.getBoundingClientRect().y + _item.getBoundingClientRect().height / 2,
+  findHoverItems(_selector, _hoverClassToAdd) {
+    if (_selector) {
+      _selector.forEach((_item) => {
+        // ---> Add
+        _item.addEventListener('mouseenter', () => {
+          if (_hoverClassToAdd) {
+            this.selectorInner.classList.add(_hoverClassToAdd)
           }
-        }
-      })
+          if (this.sticky) {
+            this.flagSticky = true
 
-      // ---> Remvoe
-      _item.addEventListener('mouseleave', () => {
-        this.selectorInner.classList.remove(this.hoverClass)
-        if (this.sticky) {
-          this.flagSticky = false
-        }
+            this.hoverPosition = {
+              x: _item.getBoundingClientRect().x + _item.getBoundingClientRect().width / 2,
+              y: _item.getBoundingClientRect().y + _item.getBoundingClientRect().height / 2,
+            }
+          }
+        })
+
+        // ---> Remove
+        _item.addEventListener('mouseleave', () => {
+          if (_hoverClassToAdd) {
+            this.selectorInner.classList.remove(_hoverClassToAdd)
+          }
+          if (this.sticky) {
+            this.flagSticky = false
+          }
+        })
       })
-    })
+    }
   }
 
   getMousePosition() {
@@ -99,7 +118,7 @@ export default class CustomCursor {
       this.cursorPosition.y -= (this.cursorPosition.y - this.mousemovement.y) * this.ease
     } else {
       this.cursorPosition.x -= ((this.cursorPosition.x - this.hoverPosition.x) * this.ease + (this.cursorPosition.x - this.mousemovement.x) * this.ease) / this.stickyAmount
-      this.cursorPosition.y -= ((this.cursorPosition.y - this.hoverPosition.y) * this.ease + (this.cursorPosition.y - this.mousemovement.y) * this.ease) / this.stickyAmount
+      this.cursorPosition.y -= ((this.cursorPosition.y - (this.hoverPosition.y + window.pageYOffset)) * this.ease + (this.cursorPosition.y - this.mousemovement.y) * this.ease) / this.stickyAmount
     }
 
     this.selectorOuter.style.left = `${this.cursorPosition.x}px`
