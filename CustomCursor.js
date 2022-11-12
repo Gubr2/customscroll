@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
-// *** CUSTOM CURSOR by Adrián Gubrica, v1.1 *** //
+// *** CUSTOM CURSOR by Adrián Gubrica, v1.2 *** //
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
@@ -55,6 +55,7 @@ export default class CustomCursor {
     // Init
     if (this.selectorOuter) {
       this.getMousePosition()
+      this.setStyles()
 
       this.animate()
     }
@@ -103,13 +104,20 @@ export default class CustomCursor {
 
   getMousePosition() {
     window.addEventListener('mousemove', (_e) => {
-      this.selectorOuter.style.display = 'block'
-
       this.mousemovement = {
         x: _e.pageX,
         y: _e.pageY,
       }
     })
+  }
+
+  setStyles() {
+    // ---> Outer
+    this.selectorOuter.style.display = 'block'
+    this.selectorOuter.style.pointerEvents = 'none'
+
+    // ---> Inner
+    this.selectorInner.style.pointerEvents = 'none'
   }
 
   animate() {
