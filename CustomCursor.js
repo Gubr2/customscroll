@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
-// *** CUSTOM CURSOR by Adrián Gubrica, v1.2 *** //
+// *** CUSTOM CURSOR by Adrián Gubrica, v1.3 *** //
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
@@ -103,11 +103,12 @@ export default class CustomCursor {
   }
 
   getMousePosition() {
-    window.addEventListener('mousemove', (_e) => {
+    document.addEventListener('mousemove', (_e) => {
       this.mousemovement = {
-        x: _e.pageX,
-        y: _e.pageY,
+        x: _e.clientX,
+        y: _e.clientY,
       }
+      console.log(_e)
     })
   }
 
@@ -115,6 +116,7 @@ export default class CustomCursor {
     // ---> Outer
     this.selectorOuter.style.display = 'block'
     this.selectorOuter.style.pointerEvents = 'none'
+    this.selectorOuter.style.position = 'absolute'
 
     // ---> Inner
     this.selectorInner.style.pointerEvents = 'none'
@@ -129,8 +131,7 @@ export default class CustomCursor {
       this.cursorPosition.y -= ((this.cursorPosition.y - (this.hoverPosition.y + window.pageYOffset)) * this.ease + (this.cursorPosition.y - this.mousemovement.y) * this.ease) / this.stickyAmount
     }
 
-    this.selectorOuter.style.left = `${this.cursorPosition.x}px`
-    this.selectorOuter.style.top = `${this.cursorPosition.y}px`
+    this.selectorOuter.style.transform = `translate(${this.cursorPosition.x}px, ${this.cursorPosition.y}px)`
 
     window.requestAnimationFrame(this.animate.bind(this))
   }
