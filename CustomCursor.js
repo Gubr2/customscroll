@@ -108,7 +108,6 @@ export default class CustomCursor {
         x: _e.clientX,
         y: _e.clientY,
       }
-      console.log(_e)
     })
   }
 
